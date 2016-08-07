@@ -14,7 +14,7 @@ var app = angular.module('app',
                      'd2Services',
                      'd2Controllers',
                      'pascalprecht.translate',
-                     'd2HeaderBar'])
+                     'd2HeaderBar','ngTable'])
               
 .value('DHIS2URL', '/dhis2/')
 

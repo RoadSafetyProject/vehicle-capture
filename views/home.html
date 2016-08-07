@@ -1,3 +1,36 @@
-<div>
-	{{'app_header'| translate}}
+<div class="row">
+    <div class="col-sm-12">
+        {{'app_header'| translate}}
+    </div>
+    <div class="col-sm-12">
+        <table ng-table="tableParams" class="table table-bordered col-sm-12" show-filter="true">
+            <tr ng-if="!loading" ng-repeat="event in $data">
+                <td title="'Vehicle Plate Number/Registration Number'"
+                    filter="{ 'Vehicle Plate Number/Registration Number': 'text'}"
+                    sortable="'Vehicle Plate Number/Registration Number'">
+                    {{event['Vehicle Plate Number/Registration Number']}}
+                </td>
+                <td title="'Offence Admission Status'" filter="{ 'Offence Admission Status': 'text'}"
+                    sortable="'Offence Admission Status'">
+                    {{event['Offence Admission Status']}}
+                </td>
+                <td title="'Action'">
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            Actions
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            <li><a ng-click="showDetails(event)">View Details</a></li>
+                            <li><a href="#">Edit</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">Separated link</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            <tr ng-if="loading"><td colspan="3" align="center"><div class="loader"></div></td></tr>
+        </table>
+    </div>
 </div>
