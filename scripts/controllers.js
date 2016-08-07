@@ -40,8 +40,39 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                 $log.info('Modal dismissed at: ' + new Date());
             });
         }
+        $scope.showEdit = function(item){
+            var modalInstance = $uibModal.open({
+                animation: $scope.animationsEnabled,
+                templateUrl: 'views/addedit.html',
+                controller: 'EditController',
+                size: "sm",
+                resolve: {
+                    item: function () {
+                        return item;
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (selectedItem) {
+                $scope.selected = selectedItem;
+            }, function () {
+                $log.info('Modal dismissed at: ' + new Date());
+            });
+        }
     })
     .controller('DetailController', function (NgTableParams,iRoadModal, $scope,$uibModalInstance,item) {
+        $scope.loading = true;
+        $scope.item = item;
+
+        $scope.ok = function () {
+            $uibModalInstance.close($scope.item);
+        };
+
+        $scope.cancel = function () {
+            $uibModalInstance.dismiss('cancel');
+        };
+    })
+    .controller('EditController', function (NgTableParams,iRoadModal, $scope,$uibModalInstance,item) {
         $scope.loading = true;
         $scope.item = item;
 
