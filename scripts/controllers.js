@@ -10,9 +10,9 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
         $scope.loading = true;
         $scope.tableParams = new NgTableParams();
         $scope.params ={pageSize:5};
-
+        $scope.programName = "Offence Event";
         $scope.getOffences = function(){
-            iRoadModal.getAll("Offence Event",$scope.params).then(function(results){
+            iRoadModal.getAll($scope.programName,$scope.params).then(function(results){
                 console.log(results);
                 $scope.tableParams.settings({
                     dataset: results
@@ -34,8 +34,8 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                 }
             });
 
-            modalInstance.result.then(function (selectedItem) {
-                $scope.selected = selectedItem;
+            modalInstance.result.then(function (resultItem) {
+
             }, function () {
                 $log.info('Modal dismissed at: ' + new Date());
             });
@@ -45,16 +45,21 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                 animation: $scope.animationsEnabled,
                 templateUrl: 'views/addedit.html',
                 controller: 'EditController',
-                size: "sm",
+                size: "lg",
                 resolve: {
                     item: function () {
                         return item;
+                    },
+                    ProgramName:function(){
+                        return $scope.programName;
                     }
                 }
             });
 
-            modalInstance.result.then(function (selectedItem) {
-                $scope.selected = selectedItem;
+            modalInstance.result.then(function (resultItem) {
+                for(var key in item){
+                    item[key] = resultItem[key];
+                }
             }, function () {
                 $log.info('Modal dismissed at: ' + new Date());
             });
@@ -65,19 +70,23 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
         $scope.item = item;
 
         $scope.ok = function () {
-            $uibModalInstance.close($scope.item);
+            $uibModalInstance.close({});
         };
 
         $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
         };
     })
-    .controller('EditController', function (NgTableParams,iRoadModal, $scope,$uibModalInstance,item) {
+    .controller('EditController', function (NgTableParams,iRoadModal, $scope,$uibModalInstance,item,ProgramName) {
         $scope.loading = true;
         $scope.item = item;
-
-        $scope.ok = function () {
-            $uibModalInstance.close($scope.item);
+        iRoadModal.getProgramByName(ProgramName).then(function(program){
+            $scope.program = program;
+            $scope.loading = false;
+        })
+        $scope.save = function () {
+            $scope.loading = true;
+            //$uibModalInstance.close($scope.item);
         };
 
         $scope.cancel = function () {

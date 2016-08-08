@@ -12,11 +12,21 @@
         to { -webkit-transform: rotate(360deg); }
     }
 </style>
-
-{{dataElement.valueType}}
-<div ng-if="dataElement.valueType == 'TEXT'">
+<div ng-if="(ngProgramStageDataElement.dataElement.valueType == 'TEXT' || ngProgramStageDataElement.dataElement.valueType == 'NUMBER') && !ngProgramStageDataElement.dataElement.optionSetValue" class="form-group">
+        <input type="text" class="form-control" ng-model="ngModel[ngProgramStageDataElement.dataElement.name]">
 </div>
-<div ng-if="dataElement.valueType != 'TEXT'">
+<div ng-if="ngProgramStageDataElement.dataElement.optionSetValue" class="form-group">
+    <select class="form-control">
+        <option ng-repeat="option in ngProgramStageDataElement.dataElement.optionSet.options">{{option.name}}</option>
+    </select>
+</div>
+<div ng-if="ngProgramStageDataElement.dataElement.valueType == 'DATE'" class="input-group">
+    <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="ngModel" is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" />
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default" ng-click="open1()"><i class="glyphicon glyphicon-calendar"></i></button>
+          </span>
+</div>
+<div ng-if="ngProgramStageDataElement.dataElement.isAttributeValue()">
     <div class="input-group">
         <input type="text"
                validator="functions.valid()"
