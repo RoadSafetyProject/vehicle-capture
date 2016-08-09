@@ -3,6 +3,7 @@
         {{'app_header'| translate}}
     </div>
     <div class="col-sm-12">
+        <button class="btn btn-success" ng-click="showAddNew()">Add</button>
         <table ng-table="tableParams" class="table table-bordered col-sm-12" show-filter="true">
             <tr ng-if="!loading" ng-repeat="event in $data">
                 <td title="'Vehicle Plate Number/Registration Number'"

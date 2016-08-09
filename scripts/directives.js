@@ -5,10 +5,8 @@
 var appDirectives = angular.module('appDirectives', [])
     .directive('elementInput', function () {
 
-        var controller = ['$scope', 'iRoadModal', function ($scope, iRoadModal) {
-            function init() {
-                $scope.items = angular.copy($scope.datasource);
-            }
+        var controller = ['$scope', 'iRoadModal','$http', function ($scope, iRoadModal,$http) {
+
             function getDayClass(data) {
                 var date = data.date,
                     mode = data.mode;
@@ -24,103 +22,105 @@ var appDirectives = angular.module('appDirectives', [])
                     }
                 }
             }
+
             // Disable weekend selection
             function disabled(data) {
                 var date = data.date,
                     mode = data.mode;
                 return mode === 'day' && (date.getDay() === 0 || date.getDay() === 6);
             }
-            init();
-            $scope.data = {}
-            /*iRoadModal.getDataElementByName($scope.ngDataElementName).then(function (dataElement) {
-                $scope.dataElement = dataElement;
-                if ($scope.dataElement.valueType == "DATE") {
 
-                    $scope.inlineOptions = {
-                        customClass: getDayClass,
-                        minDate: new Date(),
-                        showWeeks: true
-                    };
+            //iRoadModal.getDataElementByName($scope.ngDataElementName).then(function (dataElement) {
+            $scope.dataElement = $scope.ngProgramStageDataElement.dataElement;
+            if ($scope.dataElement.valueType == "DATE") {
 
-                    $scope.dateOptions = {
-                        dateDisabled: disabled,
-                        formatYear: 'yy',
-                        maxDate: new Date(2020, 5, 22),
-                        minDate: new Date(),
-                        startingDay: 1
-                    };
+                $scope.inlineOptions = {
+                    customClass: getDayClass,
+                    minDate: new Date(),
+                    showWeeks: true
+                };
 
-                    $scope.toggleMin = function () {
-                        $scope.inlineOptions.minDate = $scope.inlineOptions.minDate ? null : new Date();
-                        $scope.dateOptions.minDate = $scope.inlineOptions.minDate;
-                    };
+                $scope.dateOptions = {
+                    dateDisabled: disabled,
+                    formatYear: 'yy',
+                    maxDate: new Date(2020, 5, 22),
+                    minDate: new Date(),
+                    startingDay: 1
+                };
 
-                    $scope.toggleMin();
+                $scope.toggleMin = function () {
+                    $scope.inlineOptions.minDate = $scope.inlineOptions.minDate ? null : new Date();
+                    $scope.dateOptions.minDate = $scope.inlineOptions.minDate;
+                };
 
-                    $scope.open1 = function () {
-                        $scope.popup1.opened = true;
-                    };
+                $scope.toggleMin();
 
-                    $scope.open2 = function () {
-                        $scope.popup2.opened = true;
-                    };
+                $scope.open1 = function () {
+                    $scope.popup1.opened = true;
+                };
 
-                    $scope.setDate = function (year, month, day) {
-                        $scope.dt = new Date(year, month, day);
-                    };
+                $scope.open2 = function () {
+                    $scope.popup2.opened = true;
+                };
 
-                    $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
-                    $scope.format = $scope.formats[0];
-                    $scope.altInputFormats = ['M!/d!/yyyy'];
+                $scope.setDate = function (year, month, day) {
+                    $scope.dt = new Date(year, month, day);
+                };
 
-                    $scope.popup1 = {
-                        opened: false
-                    };
+                $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+                $scope.format = $scope.formats[0];
+                $scope.altInputFormats = ['M!/d!/yyyy'];
 
-                    $scope.popup2 = {
-                        opened: false
-                    };
+                $scope.popup1 = {
+                    opened: false
+                };
 
-                    var tomorrow = new Date();
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    var afterTomorrow = new Date();
-                    afterTomorrow.setDate(tomorrow.getDate() + 1);
-                    $scope.events = [
-                        {
-                            date: tomorrow,
-                            status: 'full'
-                        },
-                        {
-                            date: afterTomorrow,
-                            status: 'partially'
+                $scope.popup2 = {
+                    opened: false
+                };
+
+                var tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                var afterTomorrow = new Date();
+                afterTomorrow.setDate(tomorrow.getDate() + 1);
+                $scope.events = [
+                    {
+                        date: tomorrow,
+                        status: 'full'
+                    },
+                    {
+                        date: afterTomorrow,
+                        status: 'partially'
+                    }
+                ];
+            } else if ($scope.dataElement.attributeValues.length > 0) {
+                $scope.dataElement.attributeValues.forEach(function (attributeValue) {
+                    if (attributeValue.attribute.name == "Function") {
+                        if (attributeValue.attribute.name == "Function") {
+                            alert("Here");
+                            $scope.ngProgramStageDataElement.dataElement.isFunction = true;
+                            $scope.functions = eval("(" + attributeValue.value + ')');
+                            $scope.envoke = function (functionName) {
+                                $scope.functions[functionName]($scope.ngModel, $scope.response);
+                            }
+                            $scope.onBlur = function () {
+                                if ($scope.functions.events.onBlur) {
+                                    $scope.functions[$scope.functions.events.onBlur]($scope.ngModel, $scope.response);
+                                }
+                            }
+                            $scope.functions.init();
+                            $scope.dataName = "";
+                            $scope.dataTitle = "";
+                            $scope.showModal = function (dataName) {
+                                $('#dataInputModal').modal('show');
+                                $scope.dataName = dataName.toLowerCase();
+                                $scope.dataTitle = dataName;
+                            }
                         }
-                    ];
-                }
-            });*/
-            /*$scope.functions = null;
-             $scope.response = {status:"",message:"Does Not Exist"};
-             angular.forEach($scope.dataElement.attributeValues,function(attributeValue){
-
-             if(attributeValue.attribute.name == "Function"){
-             $scope.functions = eval("(" + attributeValue.value+ ')');
-             }
-             })
-             $scope.envoke = function(functionName){
-             $scope.functions[functionName]($scope.ngModel,$scope.response);
-             }
-             $scope.onBlur = function(){
-             if($scope.functions.events.onBlur){
-             $scope.functions[$scope.functions.events.onBlur]($scope.ngModel,$scope.response);
-             }
-             }
-             $scope.functions.init();
-             $scope.dataName = "";
-             $scope.dataTitle = "";
-             $scope.showModal = function(dataName){
-             $('#dataInputModal').modal('show');
-             $scope.dataName = dataName.toLowerCase();
-             $scope.dataTitle = dataName;
-             }*/
+                    }
+                })
+                console.log($scope.dataElement.attributeValues)
+            }
         }];
         return {
             restrict: 'AEC',
