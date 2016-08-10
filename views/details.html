@@ -3,7 +3,10 @@
 </div>
 <div class="modal-body">
     <table class="table">
-        <tr ng-repeat="(key,value) in item"><td>{{key}}</td><td>{{value}}</td></tr>
+        <tr ng-repeat="programStageDataElement in program.programStages[0].programStageDataElements | orderBy:'sortOrder'">
+            <td>{{programStageDataElement.dataElement.name}}</td>
+            <td>{{event | extrapolateDataValue:programStageDataElement.dataElement.name}}</td>
+        </tr>
     </table>
 </div>
 <div class="modal-footer">
