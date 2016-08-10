@@ -5,7 +5,7 @@
 var appDirectives = angular.module('appDirectives', [])
     .directive('elementInput', function () {
 
-        var controller = ['$scope', 'iRoadModal','$http', function ($scope, iRoadModal,$http) {
+        var controller = ['$scope', 'iRoadModal', '$http', function ($scope, iRoadModal, $http) {
 
             function getDayClass(data) {
                 var date = data.date,
@@ -93,29 +93,28 @@ var appDirectives = angular.module('appDirectives', [])
                         status: 'partially'
                     }
                 ];
-            } else if ($scope.dataElement.attributeValues.length > 0) {
+            } else if ($scope.dataElement.attributeValues) {
+
                 $scope.dataElement.attributeValues.forEach(function (attributeValue) {
                     if (attributeValue.attribute.name == "Function") {
-                        if (attributeValue.attribute.name == "Function") {
-                            alert("Here");
-                            $scope.ngProgramStageDataElement.dataElement.isFunction = true;
-                            $scope.functions = eval("(" + attributeValue.value + ')');
-                            $scope.envoke = function (functionName) {
-                                $scope.functions[functionName]($scope.ngModel, $scope.response);
+                        alert("Here");
+                        $scope.ngProgramStageDataElement.dataElement.isFunction = true;
+                        $scope.functions = eval("(" + attributeValue.value + ')');
+                        $scope.envoke = function (functionName) {
+                            $scope.functions[functionName]($scope.ngModel, $scope.response);
+                        }
+                        $scope.onBlur = function () {
+                            if ($scope.functions.events.onBlur) {
+                                $scope.functions[$scope.functions.events.onBlur]($scope.ngModel, $scope.response);
                             }
-                            $scope.onBlur = function () {
-                                if ($scope.functions.events.onBlur) {
-                                    $scope.functions[$scope.functions.events.onBlur]($scope.ngModel, $scope.response);
-                                }
-                            }
-                            $scope.functions.init();
-                            $scope.dataName = "";
-                            $scope.dataTitle = "";
-                            $scope.showModal = function (dataName) {
-                                $('#dataInputModal').modal('show');
-                                $scope.dataName = dataName.toLowerCase();
-                                $scope.dataTitle = dataName;
-                            }
+                        }
+                        $scope.functions.init();
+                        $scope.dataName = "";
+                        $scope.dataTitle = "";
+                        $scope.showModal = function (dataName) {
+                            $('#dataInputModal').modal('show');
+                            $scope.dataName = dataName.toLowerCase();
+                            $scope.dataTitle = dataName;
                         }
                     }
                 })

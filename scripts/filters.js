@@ -8,15 +8,102 @@ var appFilters = angular.module('appFilters', [])
         iRoadModal.getDataElements().then(function (resultDataElements) {
             dataElements = resultDataElements
         })
-        return function (event, dataElementName) {
-            var returnValue = ""
+        var cached = {};
+
+        function getDataElementId(event, dataElementName) {
+            var returnValue = "";
             dataElements.forEach(function (dataElement) {
                 event.dataValues.forEach(function (dataValue) {
                     if (dataValue.dataElement == dataElement.id && dataElementName == dataElement.displayName) {
-                        returnValue = dataValue.value;
+                        returnValue = event.event + dataValue.dataElement;
                     }
                 })
             })
             return returnValue;
         }
+
+        function getDataValue(event, dataElementName) {
+            var cacheId = getDataElementId(event, dataElementName);
+            if (cacheId in cached) {
+                // avoid returning a promise!
+                return cached[cacheId];
+            } else {
+                dataElements.forEach(function (dataElement) {
+                    event.dataValues.forEach(function (dataValue) {
+                        if (dataValue.dataElement == dataElement.id && dataElementName == dataElement.displayName && dataElement.displayName.startsWith(iRoadModal.refferencePrefix)) {
+                            var newEvent = dataValue.value;
+                            iRoadModal.getProgramByName(dataElementName.replace(iRoadModal.refferencePrefix, "")).then(function (program) {
+                                program.programStages[0].programStageDataElements.forEach(function (programStageDataElement) {
+                                    if (programStageDataElement.dataElement.code)
+                                        if (programStageDataElement.dataElement.code.toLowerCase() == ("id_" + dataElementName.replace(iRoadModal.refferencePrefix, "").toLowerCase())) {
+                                            newEvent.dataValues.forEach(function (newDataValue) {
+                                                if (newDataValue.dataElement == programStageDataElement.dataElement.id) {
+                                                    cached[event.event + dataValue.dataElement] = newDataValue.value;
+                                                }
+                                            })
+                                        }
+                                })
+                            })
+                        } else if (dataValue.dataElement == dataElement.id && dataElementName == dataElement.displayName) {
+                            cached[event.event + dataValue.dataElement] = dataValue.value;
+                        }
+                    })
+                })
+            }
+        }
+
+        getDataValue.$stateful = true;
+        return getDataValue;
+    })
+    .filter("extrapolateDataElement", function (iRoadModal) {
+        var dataElements = [];
+        iRoadModal.getDataElements().then(function (resultDataElements) {
+            dataElements = resultDataElements
+        })
+        var cached = {};
+
+        function getDataValue(dataElementName) {
+            var cacheId = dataElementName;
+            if (cacheId in cached) {
+                // avoid returning a promise!
+                return cached[cacheId];
+            } else {
+                if(dataElementName.startsWith(iRoadModal.refferencePrefix)){
+                    iRoadModal.getProgramByName(dataElementName.replace(iRoadModal.refferencePrefix, "")).then(function (program) {
+                        program.programStages[0].programStageDataElements.forEach(function (programStageDataElement) {
+                            if (programStageDataElement.dataElement.code)
+                                if (programStageDataElement.dataElement.code.toLowerCase() == ("id_" + dataElementName.replace(iRoadModal.refferencePrefix, "").toLowerCase())) {
+                                    cached[dataElementName] = programStageDataElement.dataElement.name;
+                                }
+                        })
+                    })
+                }else{
+                    cached[dataElementName] = dataElementName;
+                }
+                dataElements.forEach(function (dataElement) {
+                    event.dataValues.forEach(function (dataValue) {
+                        if (dataValue.dataElement == dataElement.id && dataElementName == dataElement.displayName && dataElement.displayName.startsWith(iRoadModal.refferencePrefix)) {
+                            var newEvent = dataValue.value;
+                            iRoadModal.getProgramByName(dataElementName.replace(iRoadModal.refferencePrefix, "")).then(function (program) {
+                                program.programStages[0].programStageDataElements.forEach(function (programStageDataElement) {
+                                    if (programStageDataElement.dataElement.code)
+                                        if (programStageDataElement.dataElement.code.toLowerCase() == ("id_" + dataElementName.replace(iRoadModal.refferencePrefix, "").toLowerCase())) {
+                                            newEvent.dataValues.forEach(function (newDataValue) {
+                                                if (newDataValue.dataElement == programStageDataElement.dataElement.id) {
+                                                    cached[event.event + dataValue.dataElement] = newDataValue.value;
+                                                }
+                                            })
+                                        }
+                                })
+                            })
+                        } else if (dataValue.dataElement == dataElement.id && dataElementName == dataElement.displayName) {
+                            cached[event.event + dataValue.dataElement] = dataValue.value;
+                        }
+                    })
+                })
+            }
+        }
+
+        getDataValue.$stateful = true;
+        return getDataValue;
     })

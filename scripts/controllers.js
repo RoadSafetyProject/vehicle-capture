@@ -124,7 +124,10 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
     })
     .controller('DetailController', function (NgTableParams,iRoadModal, $scope,$uibModalInstance,program,event) {
         $scope.loading = true;
-        $scope.event = event;
+        iRoadModal.getRelations(event).then(function(newEvent){
+            $scope.event = newEvent;
+            $scope.loading = false;
+        })
         $scope.program = program;
         console.log(program.programStages[0].programStageDataElements);
         $scope.ok = function () {
