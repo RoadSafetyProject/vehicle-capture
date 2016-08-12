@@ -3,88 +3,90 @@
         animation: spin 1s infinite linear;
         -webkit-animation: spin2 1s infinite linear;
     }
+
     @keyframes spin {
-        from { transform: scale(1) rotate(0deg); }
-        to { transform: scale(1) rotate(360deg); }
+        from {
+            transform: scale(1) rotate(0deg);
+        }
+        to {
+            transform: scale(1) rotate(360deg);
+        }
     }
+
     @-webkit-keyframes spin2 {
-        from { -webkit-transform: rotate(0deg); }
-        to { -webkit-transform: rotate(360deg); }
+        from {
+            -webkit-transform: rotate(0deg);
+        }
+        to {
+            -webkit-transform: rotate(360deg);
+        }
     }
 </style>
-<div ng-if="(ngProgramStageDataElement.dataElement.valueType == 'TEXT' || ngProgramStageDataElement.dataElement.valueType == 'NUMBER') && !ngProgramStageDataElement.dataElement.optionSetValue" class="form-group">
-        <input type="text" class="form-control" ng-model="ngModel[ngProgramStageDataElement.dataElement.name]">
-</div>
-<div ng-if="ngProgramStageDataElement.dataElement.optionSetValue" class="form-group">
-    <select class="form-control">
-        <option ng-repeat="option in ngProgramStageDataElement.dataElement.optionSet.options">{{option.name}}</option>
-    </select>
-</div>
-<div ng-if="ngProgramStageDataElement.dataElement.valueType == 'DATE'" class="input-group">
-    <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="ngModel" is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" />
+<script type="text/ng-template" id="customTemplate.html">
+    <a>
+        <img ng-src="http://upload.wikimedia.org/wikipedia/commons/thumb/{{match.model.flag}}" width="16">
+        <span ng-bind-html="match.label | uibTypeaheadHighlight:query"></span>
+    </a>
+</script>
+<div ng-if="!relation">
+    <div ng-if="(ngProgramStageDataElement.dataElement.valueType == 'TEXT' || ngProgramStageDataElement.dataElement.valueType == 'NUMBER') && !ngProgramStageDataElement.dataElement.optionSetValue"
+         class="form-group">
+        <input type="text" class="form-control" ng-model="ngModel.value">
+    </div>
+    <div ng-if="ngProgramStageDataElement.dataElement.optionSetValue" class="form-group">
+        <select class="form-control">
+            <option ng-repeat="option in ngProgramStageDataElement.dataElement.optionSet.options">{{option.name}}
+            </option>
+        </select>
+    </div>
+    <div ng-if="ngProgramStageDataElement.dataElement.valueType == 'DATE'" class="input-group">
+        <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="ngModel.value"
+               is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close"
+               alt-input-formats="altInputFormats"/>
           <span class="input-group-btn">
-            <button type="button" class="btn btn-default" ng-click="open1()"><i class="glyphicon glyphicon-calendar"></i></button>
+            <button type="button" class="btn btn-default" ng-click="open1()"><i
+                    class="glyphicon glyphicon-calendar"></i></button>
           </span>
+    </div>
 </div>
-<div ng-if="ngProgramStageDataElement.dataElement.isFunction">
+<div ng-if="relation">
+
     <div class="input-group">
-        <input type="text"
-               validator="functions.valid()"
-               class="form-control" ng-model="ngModel"
-               ng-pattern="functions.pattern" ng-blur="onBlur()" aria-label="Heyloow"
-               uib-typeahead="item.name for item in functions.search($viewValue)"
-               typeahead-loading="loadingLocations"
-               typeahead-on-select="functions.onSearchSelect($item, $model, $label)"
-               typeahead-no-results="noResults"
-        />
+        <style>
+            .ui-select-focusser.ui-select-offscreen.ng-scope{
+                display:none;
+            }
+        </style>
+        <ui-select ng-model="ngModel.value" theme="selectize" ng-disabled="false" title="Choose a country">
+            <ui-select-match placeholder="Select...">{{$select.selected | extrapolateDataValue:relation.dataElement.name}}</ui-select-match>
+            <ui-select-choices repeat="event in relation.data | filter: $select.search" refresh-delay="0" refresh="relation.searchRelations($select.search)">
+                <span ng-bind-html="event | highlight: $select.search | extrapolateDataValue:relation.dataElement.name"></span>
+            </ui-select-choices>
+        </ui-select>
+        <!--<input type="text" class="form-control" ng-model="ngModel.value.dataValues[relation.index].value"
+               uib-typeahead="address for address in relation.searchRelations($viewValue)"
+               typeahead-template-url="customTemplate.html"
+               ng-blur="relation.onBlur(ngModel.value.dataValues[relation.index].value)"
+               typeahead-loading="relation.loading" typeahead-no-results="noResults"
+        />-->
         <div class="input-group-btn">
             <button type="button" class="btn btn-default dropdown-toggle"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span ng-if='response.status == "LOADING"' class="glyphicon glyphicon-refresh spinning"></span>
-                <span ng-if='response.status != "LOADING"'>Actions<span class="caret"></span></span>
+                <span ng-if='relation.feedback.status == "LOADING"' class="glyphicon glyphicon-refresh spinning"></span>
+                <span ng-if='relation.feedback.status != "LOADING"'>Actions<span class="caret"></span></span>
             </button>
             <ul class="dropdown-menu dropdown-menu-right">
-                <li ng-repeat="func in functions.actions" ng-click="envoke(func.functionName)"><a>{{func.name}}</a></li>
+                <li><a></a></li>
             </ul>
         </div>
         <!-- /btn-group -->
     </div>
-    <div ng-if='response.status == "ERROR"' class="alert alert-danger" role="alert">
+    <div ng-if='relation.feedback.status == "ERROR"' class="alert alert-danger" role="alert">
         <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        {{response.message}}
+        {{relation.feedback.message}}
     </div>
-    <div ng-if='response.status == "SUCCESS"' class="alert alert-success" role="alert">
+    <div ng-if='relation.feedback.status == "SUCCESS"' class="alert alert-success" role="alert">
         <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        {{response.message}}
-    </div>
-    <div ng-if="dataTitle !=''" class="modal fade" id="dataInputModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">{{dataTitle}}</h4>
-                </div>
-                <div class="modal-body">
-                    <table datatable="ng" class="mws-datatable-fn mws-table">
-                        <thead>
-                        </thead>
-                        <tbody>
-                        <tr ng-if="(key != 'id')" ng-repeat="(key, value) in data[dataName]">
-                            <td>
-                                <label>{{key}}</label>
-                            </td>
-                            <td >
-                                <label>{{value}}</label>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
+        {{relation.feedback.message}}
     </div>
 </div>

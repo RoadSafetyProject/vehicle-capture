@@ -23,6 +23,7 @@ var appFilters = angular.module('appFilters', [])
         }
 
         function getDataValue(event, dataElementName) {
+            console.log(event);
             var cacheId = getDataElementId(event, dataElementName);
             if (cacheId in cached) {
                 // avoid returning a promise!
@@ -69,18 +70,13 @@ var appFilters = angular.module('appFilters', [])
                 return cached[cacheId];
             } else {
                 if(dataElementName.startsWith(iRoadModal.refferencePrefix)){
-                    iRoadModal.getProgramByName(dataElementName.replace(iRoadModal.refferencePrefix, "")).then(function (program) {
-                        program.programStages[0].programStageDataElements.forEach(function (programStageDataElement) {
-                            if (programStageDataElement.dataElement.code)
-                                if (programStageDataElement.dataElement.code.toLowerCase() == ("id_" + dataElementName.replace(iRoadModal.refferencePrefix, "").toLowerCase())) {
-                                    cached[dataElementName] = programStageDataElement.dataElement.name;
-                                }
-                        })
+                    iRoadModal.getRelationship(dataElementName).then(function (dataElement) {
+                        cached[dataElementName] = dataElement.name;
                     })
                 }else{
                     cached[dataElementName] = dataElementName;
                 }
-                dataElements.forEach(function (dataElement) {
+                /*dataElements.forEach(function (dataElement) {
                     event.dataValues.forEach(function (dataValue) {
                         if (dataValue.dataElement == dataElement.id && dataElementName == dataElement.displayName && dataElement.displayName.startsWith(iRoadModal.refferencePrefix)) {
                             var newEvent = dataValue.value;
@@ -100,7 +96,7 @@ var appFilters = angular.module('appFilters', [])
                             cached[event.event + dataValue.dataElement] = dataValue.value;
                         }
                     })
-                })
+                })*/
             }
         }
 

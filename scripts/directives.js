@@ -6,7 +6,6 @@ var appDirectives = angular.module('appDirectives', [])
     .directive('elementInput', function () {
 
         var controller = ['$scope', 'iRoadModal', '$http', function ($scope, iRoadModal, $http) {
-
             function getDayClass(data) {
                 var date = data.date,
                     mode = data.mode;
@@ -29,7 +28,6 @@ var appDirectives = angular.module('appDirectives', [])
                     mode = data.mode;
                 return mode === 'day' && (date.getDay() === 0 || date.getDay() === 6);
             }
-
             //iRoadModal.getDataElementByName($scope.ngDataElementName).then(function (dataElement) {
             $scope.dataElement = $scope.ngProgramStageDataElement.dataElement;
             if ($scope.dataElement.valueType == "DATE") {
@@ -93,32 +91,56 @@ var appDirectives = angular.module('appDirectives', [])
                         status: 'partially'
                     }
                 ];
-            } else if ($scope.dataElement.attributeValues) {
-
-                $scope.dataElement.attributeValues.forEach(function (attributeValue) {
-                    if (attributeValue.attribute.name == "Function") {
-                        alert("Here");
-                        $scope.ngProgramStageDataElement.dataElement.isFunction = true;
-                        $scope.functions = eval("(" + attributeValue.value + ')');
-                        $scope.envoke = function (functionName) {
-                            $scope.functions[functionName]($scope.ngModel, $scope.response);
-                        }
-                        $scope.onBlur = function () {
-                            if ($scope.functions.events.onBlur) {
-                                $scope.functions[$scope.functions.events.onBlur]($scope.ngModel, $scope.response);
+            }
+            else if ($scope.dataElement.name.startsWith(iRoadModal.refferencePrefix)) {
+                $scope.relation = {
+                    loading:true,
+                    data:[],
+                    onBlur:function(value){
+                        //console.log(value)
+                        this.feedback = {status:"LOADING"};
+                        var self = this;
+                        return iRoadModal.get($scope.dataElement.name.replace(iRoadModal.refferencePrefix,""),
+                            {filter:{left:this.dataElement.id,operator:"EQ",right:value}}).then(function(results){
+                            console.log();
+                            if(value != $scope.ngModel.value.dataValues[self.index].value){
+                                alert("Here");
                             }
-                        }
-                        $scope.functions.init();
-                        $scope.dataName = "";
-                        $scope.dataTitle = "";
-                        $scope.showModal = function (dataName) {
-                            $('#dataInputModal').modal('show');
-                            $scope.dataName = dataName.toLowerCase();
-                            $scope.dataTitle = dataName;
-                        }
+                            if(results.length == 0){
+                                self.feedback = {status:"ERROR",message:$scope.dataElement.name.replace(iRoadModal.refferencePrefix,"") + " with " + self.dataElement.name+" of " + value + " does not exist."}
+                            }else{
+                                self.feedback = {};
+                            }
+                        })
+                    },
+                    searchRelations:function(value){
+                        this.feedback = {status:"LOADING"};
+                        var self = this;
+                        return iRoadModal.get($scope.dataElement.name.replace(iRoadModal.refferencePrefix,""),
+                            {filter:{left:this.dataElement.id,operator:"LIKE",right:value}}).then(function(results){
+                            self.feedback = {};
+                            alert(JSON.stringify(results));
+                            self.data = results;
+                        },function(error){
+                            alert(JSON.strigify(error));
+                        })
+                    },
+                    setDataElementIndex:function(dataElementName,dataValues){
+                        this.feedback = {status:"LOADING"};
+                        var self = this;
+                        iRoadModal.getRelationship(dataElementName).then(function(dataElement){
+                            self.dataElement = dataElement;
+                            dataValues.forEach(function(dataValue,index){
+                                if(dataValue.dataElement == dataElement.id){
+                                    self.index = index;
+                                }
+                            })
+                            self.feedback = {};
+                        })
                     }
-                })
-                console.log($scope.dataElement.attributeValues)
+                }
+                //console.log();
+                $scope.relation.setDataElementIndex($scope.dataElement.name,$scope.ngModel.value.dataValues)
             }
         }];
         return {

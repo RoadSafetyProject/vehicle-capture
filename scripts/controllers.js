@@ -72,7 +72,7 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                 $log.info('Modal dismissed at: ' + new Date());
             });
         }
-        $scope.showEdit = function(item){
+        $scope.showEdit = function(event){
             var modalInstance = $uibModal.open({
                 animation: $scope.animationsEnabled,
                 templateUrl: 'views/addedit.html',
@@ -97,18 +97,18 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             });
         }
         $scope.showAddNew = function(){
-            var item = {};
+            var event = {};
             var modalInstance = $uibModal.open({
                 animation: $scope.animationsEnabled,
                 templateUrl: 'views/addedit.html',
                 controller: 'EditController',
                 size: "lg",
                 resolve: {
-                    item: function () {
-                        return item;
+                    event: function () {
+                        return event;
                     },
-                    ProgramName:function(){
-                        return $scope.programName;
+                    program:function(){
+                        return $scope.program;
                     }
                 }
             });
@@ -122,7 +122,7 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             });
         }
     })
-    .controller('DetailController', function (NgTableParams,iRoadModal, $scope,$uibModalInstance,program,event) {
+    .controller('DetailController', function (iRoadModal, $scope,$uibModalInstance,program,event) {
         $scope.loading = true;
         iRoadModal.getRelations(event).then(function(newEvent){
             $scope.event = newEvent;
@@ -139,8 +139,20 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
         };
     })
     .controller('EditController', function (NgTableParams,iRoadModal, $scope,$uibModalInstance,program,event,toaster) {
-        $scope.event = event;
+        iRoadModal.getRelations(event).then(function(newEvent){
+            $scope.event = newEvent;
+            $scope.loading = false;
+        })
         $scope.program = program;
+        $scope.getDataElementIndex = function(dataElement){
+            var index = "";
+            event.dataValues.forEach(function(dataValue,i){
+                if(dataValue.dataElement == dataElement.id){
+                    index = i;
+                }
+            })
+            return index;
+        }
         $scope.save = function () {
             $scope.loading = true;
             iRoadModal.save("Offence Event",$scope.item).then(function(results){
