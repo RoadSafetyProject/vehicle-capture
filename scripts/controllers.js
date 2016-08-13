@@ -154,6 +154,19 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             return index;
         }
         $scope.save = function () {
+            iRoadModal.setRelations(event).then(function(newEvent){
+                DHIS2EventFactory.update(newEvent).then(function(results){
+                    console.log(results);
+                    $scope.loading = false;
+                    toaster.pop('success', result.response.status, result.message);
+                    $uibModalInstance.close($scope.item);
+                },function(error){
+                    $scope.loading = false;
+                    console.log(error);
+                    toaster.pop('error', error.status, error.statusText);
+                })
+            })
+            /*
             $scope.loading = true;
             iRoadModal.save("Offence Event",$scope.item).then(function(results){
                 console.log(results);
@@ -164,7 +177,7 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                 $scope.loading = false;
                 console.log(error);
                 toaster.pop('error', error.status, error.statusText);
-            });
+            });*/
         };
 
         $scope.cancel = function () {

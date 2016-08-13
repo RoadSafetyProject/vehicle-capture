@@ -60,7 +60,7 @@
         <ui-select ng-model="ngModel.value" theme="selectize" ng-disabled="false" title="Choose a country">
             <ui-select-match placeholder="Select...">{{$select.selected | extrapolateDataValue:relation.dataElement.name}}</ui-select-match>
             <ui-select-choices repeat="event in relation.data | filter: $select.search" refresh-delay="0" refresh="relation.searchRelations($select.search)">
-                <span ng-bind-html="event | highlight: $select.search | extrapolateDataValue:relation.dataElement.name"></span>
+                <span ng-bind-html="event | extrapolateDataValue:relation.dataElement.name | highlight: $select.search"></span>
             </ui-select-choices>
         </ui-select>
         <!--<input type="text" class="form-control" ng-model="ngModel.value.dataValues[relation.index].value"

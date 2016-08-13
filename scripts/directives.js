@@ -96,33 +96,13 @@ var appDirectives = angular.module('appDirectives', [])
                 $scope.relation = {
                     loading:true,
                     data:[],
-                    onBlur:function(value){
-                        //console.log(value)
-                        this.feedback = {status:"LOADING"};
-                        var self = this;
-                        return iRoadModal.get($scope.dataElement.name.replace(iRoadModal.refferencePrefix,""),
-                            {filter:{left:this.dataElement.id,operator:"EQ",right:value}}).then(function(results){
-                            console.log();
-                            if(value != $scope.ngModel.value.dataValues[self.index].value){
-                                alert("Here");
-                            }
-                            if(results.length == 0){
-                                self.feedback = {status:"ERROR",message:$scope.dataElement.name.replace(iRoadModal.refferencePrefix,"") + " with " + self.dataElement.name+" of " + value + " does not exist."}
-                            }else{
-                                self.feedback = {};
-                            }
-                        })
-                    },
                     searchRelations:function(value){
                         this.feedback = {status:"LOADING"};
                         var self = this;
                         return iRoadModal.get($scope.dataElement.name.replace(iRoadModal.refferencePrefix,""),
                             {filter:{left:this.dataElement.id,operator:"LIKE",right:value}}).then(function(results){
                             self.feedback = {};
-                            alert(JSON.stringify(results));
                             self.data = results;
-                        },function(error){
-                            alert(JSON.strigify(error));
                         })
                     },
                     setDataElementIndex:function(dataElementName,dataValues){
@@ -140,7 +120,7 @@ var appDirectives = angular.module('appDirectives', [])
                     }
                 }
                 //console.log();
-                $scope.relation.setDataElementIndex($scope.dataElement.name,$scope.ngModel.value.dataValues)
+                //$scope.relation.setDataElementIndex($scope.dataElement.name,$scope.ngModel.value.dataValues)
             }
         }];
         return {
