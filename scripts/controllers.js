@@ -6,11 +6,10 @@
 var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
 
     .controller('MainController', function (NgTableParams,iRoadModal, $scope,$uibModal,$log) {
-        //$scope.offenceEvent = iRoadModal("Offence Event");
         $scope.loading = true;
         $scope.tableParams = new NgTableParams();
         $scope.params ={pageSize:5};
-        $scope.programName = "Offence Event";
+        $scope.programName = "Vehicle";
         function createColumns(programStageDataElements) {
             var cols = []
             if (programStageDataElements){
@@ -35,7 +34,7 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             });
             return cols;
         }
-        $scope.getOffences = function(){
+        function vehicle(){
             iRoadModal.getAll($scope.programName,$scope.params).then(function(results){
                 $scope.tableParams.settings({
                     dataset: results
@@ -49,7 +48,8 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             })
         }
 
-        $scope.getOffences();
+        vehicle();
+
         $scope.showDetails = function(event){
             var modalInstance = $uibModal.open({
                 animation: $scope.animationsEnabled,
