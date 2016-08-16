@@ -22,7 +22,6 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                         title: programStageDataElement.dataElement.name,
                         headerTitle: programStageDataElement.dataElement.name,
                         show: programStageDataElement.displayInReports,
-                        sortable: programStageDataElement.dataElement.name.replace(" ",""),
                         filter: filter
                     });
                 })
@@ -36,14 +35,15 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             return cols;
         }
         $scope.getOffences = function(){
-            iRoadModal.getAll($scope.programName,$scope.params).then(function(results){
-                $scope.tableParams.settings({
-                    dataset: results
-                });
-                $scope.loading = false;
-                iRoadModal.getProgramByName($scope.programName).then(function(program){
-                    $scope.program = program;
-                    $scope.tableCols = createColumns(program.programStages[0].programStageDataElements);
+            iRoadModal.getProgramByName($scope.programName).then(function(program){
+                $scope.program = program;
+                $scope.tableCols = createColumns(program.programStages[0].programStageDataElements);
+                iRoadModal.getAll($scope.programName,$scope.params).then(function(results){
+                    console.log(results);
+                    $scope.tableParams.settings({
+                        dataset: results
+                    });
+                    $scope.loading = false;
 
                 })
             })
@@ -89,9 +89,7 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             });
 
             modalInstance.result.then(function (resultItem) {
-                for(var key in item){
-                    item[key] = resultItem[key];
-                }
+
             }, function () {
                 $log.info('Modal dismissed at: ' + new Date());
             });
@@ -125,6 +123,7 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
     .controller('DetailController', function (iRoadModal, $scope,$uibModalInstance,program,event) {
         $scope.loading = true;
         iRoadModal.getRelations(event).then(function(newEvent){
+            console.log(newEvent);
             $scope.event = newEvent;
             $scope.loading = false;
         })
@@ -138,12 +137,14 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             $uibModalInstance.dismiss('cancel');
         };
     })
-    .controller('EditController', function (NgTableParams,iRoadModal, $scope,$uibModalInstance,program,event,toaster) {
-        iRoadModal.getRelations(event).then(function(newEvent){
+    .controller('EditController', function (NgTableParams,iRoadModal, $scope,$uibModalInstance,program,event,toaster,DHIS2EventFactory) {
+        console.log(event.dataValues);
+        iRoadModal.initiateEvent(event,program).then(function(newEvent){
             $scope.event = newEvent;
             $scope.loading = false;
         })
         $scope.program = program;
+        console.log(program);
         $scope.getDataElementIndex = function(dataElement){
             var index = "";
             event.dataValues.forEach(function(dataValue,i){
@@ -151,15 +152,20 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                     index = i;
                 }
             })
+            if(index == ""){
+                event.dataValues.push({dataElement:dataElement.id,value:""});
+                index = event.dataValues.length - 1;
+            }
             return index;
         }
         $scope.save = function () {
-            iRoadModal.setRelations(event).then(function(newEvent){
+            $scope.loading = true;
+            iRoadModal.setRelations($scope.event).then(function(newEvent){
                 DHIS2EventFactory.update(newEvent).then(function(results){
                     console.log(results);
                     $scope.loading = false;
-                    toaster.pop('success', result.response.status, result.message);
-                    $uibModalInstance.close($scope.item);
+                    toaster.pop('success', results.response.status, results.message);
+                    $uibModalInstance.close($scope.event);
                 },function(error){
                     $scope.loading = false;
                     console.log(error);
