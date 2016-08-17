@@ -44,7 +44,7 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                         dataset: results
                     });
                     $scope.loading = false;
-
+                    console.log($scope.tableParams);
                 })
             })
         }
@@ -111,10 +111,8 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                 }
             });
 
-            modalInstance.result.then(function (resultItem) {
-                for(var key in item){
-                    item[key] = resultItem[key];
-                }
+            modalInstance.result.then(function (resultEvent) {
+                $scope.tableParams.data.push(resultEvent);
             }, function () {
                 $log.info('Modal dismissed at: ' + new Date());
             });
@@ -160,30 +158,13 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
         }
         $scope.save = function () {
             $scope.loading = true;
-            iRoadModal.setRelations($scope.event).then(function(newEvent){
-                DHIS2EventFactory.update(newEvent).then(function(results){
-                    console.log(results);
-                    $scope.loading = false;
-                    toaster.pop('success', results.response.status, results.message);
-                    $uibModalInstance.close($scope.event);
-                },function(error){
-                    $scope.loading = false;
-                    console.log(error);
-                    toaster.pop('error', error.status, error.statusText);
-                })
-            })
-            /*
-            $scope.loading = true;
-            iRoadModal.save("Offence Event",$scope.item).then(function(results){
-                console.log(results);
+            iRoadModal.save($scope.event,$scope.program).then(function(result){
                 $scope.loading = false;
-                toaster.pop('success', result.response.status, result.message);
-                $uibModalInstance.close($scope.item);
+                $uibModalInstance.close(result);
             },function(error){
                 $scope.loading = false;
                 console.log(error);
-                toaster.pop('error', error.status, error.statusText);
-            });*/
+            });
         };
 
         $scope.cancel = function () {

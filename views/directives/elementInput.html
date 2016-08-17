@@ -31,10 +31,10 @@
 <div ng-if="!relation">
     <div ng-if="(ngProgramStageDataElement.dataElement.valueType == 'TEXT' || ngProgramStageDataElement.dataElement.valueType == 'NUMBER') && !ngProgramStageDataElement.dataElement.optionSetValue"
          class="form-group">
-        <input type="text" class="form-control" ng-model="ngModel.value">
+        <input type="text" class="form-control" ng-model="ngModel.value" ng-required="ngProgramStageDataElement.compulsory">
     </div>
     <div ng-if="ngProgramStageDataElement.dataElement.optionSetValue" class="form-group">
-        <select class="form-control">
+        <select class="form-control" ng-required="ngProgramStageDataElement.compulsory">
             <option ng-repeat="option in ngProgramStageDataElement.dataElement.optionSet.options">{{option.name}}
             </option>
         </select>
@@ -42,7 +42,7 @@
     <div ng-if="ngProgramStageDataElement.dataElement.valueType == 'DATE'" class="input-group">
         {{ngModel.value}}
         <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="ngModel.value"
-               is-open="popup1.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close"
+               is-open="popup1.opened" datepicker-options="dateOptions"  ng-required="ngProgramStageDataElement.compulsory" close-text="Close"
                alt-input-formats="altInputFormats"/>
           <span class="input-group-btn">
             <button type="button" class="btn btn-default" ng-click="open1()"><i
@@ -58,8 +58,7 @@
                 display:none;
             }
         </style>
-        Selected - {{ngModel}}
-        <ui-select ng-model="ngModel.value" theme="selectize" ng-disabled="false" title="Choose a country">
+        <ui-select  ng-required="ngProgramStageDataElement.compulsory" ng-model="ngModel.value" theme="selectize" ng-disabled="false" title="Choose a country">
             <ui-select-match placeholder="Select...">{{$select.selected | extrapolateDataValue:relation.dataElement.name}}</ui-select-match>
             <ui-select-choices repeat="event in relation.data | filter: $select.search" refresh-delay="0" refresh="relation.searchRelations($select.search)">
                 <span ng-bind-html="event | extrapolateDataValue:relation.dataElement.name | highlight: $select.search"></span>
