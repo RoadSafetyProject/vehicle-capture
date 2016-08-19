@@ -58,18 +58,12 @@
                 display:none;
             }
         </style>
-        <ui-select  ng-required="ngProgramStageDataElement.compulsory" ng-model="ngModel.value" theme="selectize" ng-disabled="false" title="Choose a country">
+        <ui-select ng-model="ngModel.value" theme="selectize">
             <ui-select-match placeholder="Select...">{{$select.selected | extrapolateDataValue:relation.dataElement.name}}</ui-select-match>
-            <ui-select-choices repeat="event in relation.data | filter: $select.search" refresh-delay="0" refresh="relation.searchRelations($select.search)">
+            <ui-select-choices repeat="event as event in relation.data | filter: $select.search" refresh-delay="0" refresh="relation.searchRelations($select.search)">
                 <span ng-bind-html="event | extrapolateDataValue:relation.dataElement.name | highlight: $select.search"></span>
             </ui-select-choices>
         </ui-select>
-        <!--<input type="text" class="form-control" ng-model="ngModel.value.dataValues[relation.index].value"
-               uib-typeahead="address for address in relation.searchRelations($viewValue)"
-               typeahead-template-url="customTemplate.html"
-               ng-blur="relation.onBlur(ngModel.value.dataValues[relation.index].value)"
-               typeahead-loading="relation.loading" typeahead-no-results="noResults"
-        />-->
         <div ng-if="relationships.length > 0" class="input-group-btn">
             <button type="button" class="btn btn-default dropdown-toggle"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

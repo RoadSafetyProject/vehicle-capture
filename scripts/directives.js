@@ -131,9 +131,7 @@ var appDirectives = angular.module('appDirectives', [])
             restrict: 'AEC',
             require: '^form',
             scope: {
-                //actions:actions,
                 ngModel: '=',
-                crudOperation: '=',
                 ngProgramStageDataElement: '='
             },
             controller: controller,
