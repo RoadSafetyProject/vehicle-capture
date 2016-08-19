@@ -65,8 +65,13 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             });
 
             modalInstance.result.then(function (resultItem) {
+                iRoadModal.setRelations(event).then(function(){
 
+                });
             }, function () {
+                iRoadModal.setRelations(event).then(function(){
+
+                });
                 $log.info('Modal dismissed at: ' + new Date());
             });
         }
@@ -87,7 +92,15 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             });
 
             modalInstance.result.then(function (resultEvent) {
+                $scope.tableParams.data.forEach(function(event){
+                    if(event.event == resultEvent.event){
+                        Object.keys(event).forEach(function(key){
+                            event[key] = resultEvent[key];
+                        })
 
+                    }
+                })
+                $scope.tableParams.reload();
             }, function () {
                 iRoadModal.setRelations(event).then(function(){
 
