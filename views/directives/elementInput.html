@@ -64,14 +64,14 @@
                 <span ng-bind-html="event | extrapolateDataValue:relation.dataElement.name | highlight: $select.search"></span>
             </ui-select-choices>
         </ui-select>
-        <div ng-if="relationships.length > 0" class="input-group-btn">
+        <div ng-if="relation.programs.length > 0" class="input-group-btn">
             <button type="button" class="btn btn-default dropdown-toggle"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span ng-if='relation.feedback.status == "LOADING"' class="glyphicon glyphicon-refresh spinning"></span>
                 <span ng-if='relation.feedback.status != "LOADING"'>Actions<span class="caret"></span></span>
             </button>
             <ul class="dropdown-menu dropdown-menu-right">
-                <li ng-repeat="relationship in relationships"><a>relationship.dataElement.name</a></li>
+                <li ng-repeat="program in relation.programs"><a ng-click="show(program,ngModel.value)">View {{program.displayName}} Details</a></li>
             </ul>
         </div>
         <!-- /btn-group -->

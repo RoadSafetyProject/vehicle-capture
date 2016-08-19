@@ -39,12 +39,10 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                 $scope.program = program;
                 $scope.tableCols = createColumns(program.programStages[0].programStageDataElements);
                 iRoadModal.getAll($scope.programName,$scope.params).then(function(results){
-                    console.log(results);
                     $scope.tableParams.settings({
                         dataset: results
                     });
                     $scope.loading = false;
-                    console.log($scope.tableParams);
                 })
             })
         }
@@ -128,7 +126,6 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             $scope.loading = false;
         })
         $scope.program = program;
-        console.log(program.programStages[0].programStageDataElements);
         $scope.ok = function () {
             $uibModalInstance.close({});
         };
@@ -139,7 +136,6 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
     })
     .controller('EditController', function (NgTableParams,iRoadModal, $scope,$uibModalInstance,program,event,toaster,DHIS2EventFactory) {
         iRoadModal.initiateEvent(event,program).then(function(newEvent){
-            console.log(JSON.stringify(newEvent));
             $scope.event = newEvent;
             $scope.loading = false;
             $scope.getDataElementIndex = function(dataElement){
@@ -149,24 +145,18 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                         index = i;
                     }
                 })
-                /*if(index == ""){
-                    $scope.event.dataValues.push({dataElement:dataElement.id,value:""});
-                    index = event.dataValues.length - 1;
-                }*/
                 return index;
             }
         })
         $scope.program = program;
 
         $scope.save = function () {
-            console.log($scope.event);
             $scope.loading = true;
             iRoadModal.save($scope.event,$scope.program).then(function(result){
                 $scope.loading = false;
                 $uibModalInstance.close(result);
             },function(error){
                 $scope.loading = false;
-                console.log(error);
             });
         };
 

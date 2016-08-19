@@ -5,7 +5,7 @@
 var appDirectives = angular.module('appDirectives', [])
     .directive('elementInput', function () {
 
-        var controller = ['$scope', 'iRoadModal', '$http', function ($scope, iRoadModal, $http) {
+        var controller = ['$scope', 'iRoadModal', '$uibModal', function ($scope, iRoadModal, $uibModal) {
             function getDayClass(data) {
                 var date = data.date,
                     mode = data.mode;
@@ -29,6 +29,28 @@ var appDirectives = angular.module('appDirectives', [])
                 return mode === 'day' && (date.getDay() === 0 || date.getDay() === 6);
             }
             //iRoadModal.getDataElementByName($scope.ngDataElementName).then(function (dataElement) {
+            $scope.show = function(program,event){
+                var modalInstance = $uibModal.open({
+                    animation: $scope.animationsEnabled,
+                    templateUrl: 'views/details.html',
+                    controller: 'DetailController',
+                    size: "sm",
+                    resolve: {
+                        event: function () {
+                            return event;
+                        },
+                        program:function(){
+                            return program;
+                        }
+                    }
+                });
+
+                modalInstance.result.then(function (resultItem) {
+
+                }, function () {
+                    $log.info('Modal dismissed at: ' + new Date());
+                });
+            }
             $scope.dataElement = $scope.ngProgramStageDataElement.dataElement;
             if ($scope.dataElement.valueType == "DATE") {
 
@@ -95,7 +117,7 @@ var appDirectives = angular.module('appDirectives', [])
             else if ($scope.dataElement.name.startsWith(iRoadModal.refferencePrefix)) {
                 $scope.relation = {
                     loading:true,
-                    relationships:[],
+                    programs:[],
                     data:[],
                     searchRelations:function(value){
                         this.feedback = {status:"LOADING"};
@@ -112,18 +134,12 @@ var appDirectives = angular.module('appDirectives', [])
                         iRoadModal.getRelationship(dataElementName).then(function(dataElement){
                             self.dataElement = dataElement;
                             iRoadModal.getProgramByName(dataElementName.replace(iRoadModal.refferencePrefix,"")).then(function(program){
-                                program.programStages[0].programStageDataElements.forEach(function(programStageDataElement){
-                                    if(programStageDataElement.dataElement.name.startsWith(iRoadModal.refferencePrefix)){
-                                        alert("Here");
-                                        self.relationships.push(programStageDataElement);
-                                    }
-                                })
+                                self.programs.push(program);
                                 self.feedback = {};
                             })
                         })
                     }
                 }
-                //console.log();
                 $scope.relation.setDataElement($scope.dataElement.name)
             }
         }];
