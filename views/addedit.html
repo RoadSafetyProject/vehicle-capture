@@ -1,8 +1,8 @@
 <div class="modal-header">
-    <h3 class="modal-title">{{program.displayName}}</h3>
+    <h3 class="modal-title">{{program.name}}</h3>
 </div>
 <form ng-submit="save()">
-<div class="modal-body">e
+<div class="modal-body">
         <table ng-if="!loading" class="table">
             <tr ng-repeat="programStageDataElement in program.programStages[0].programStageDataElements | orderBy:'sortOrder'">
                 <td>{{programStageDataElement.dataElement.name | extrapolateDataElement}}</td>
