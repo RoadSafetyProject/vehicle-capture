@@ -81,7 +81,7 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                 });
                 $log.info('Modal dismissed at: ' + new Date());
             });
-        }
+        };
         $scope.showEdit = function(event){
             var modalInstance = $uibModal.open({
                 animation: $scope.animationsEnabled,
@@ -114,7 +114,7 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                 });
                 $log.info('Modal dismissed at: ' + new Date());
             });
-        }
+        };
         $scope.showAddNew = function(){
             var event = {};
             var modalInstance = $uibModal.open({
@@ -137,6 +137,25 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             }, function () {
 
             });
+        };
+
+        $scope.addRelationData = function(relationName,event){
+            iRoadModal.getProgramByName(relationName).then(function(program){
+                program.displayName = $scope.program.displayName + " - " + relationName;
+                $scope.relationProgram = program;
+                console.log(program);
+                console.log(relationName);
+                console.log(event);
+            });
+        };
+
+        $scope.viewRelationData = function(relationName,eventId){
+            console.log(relationName);
+            console.log(eventId);
+        };
+
+        $scope.showOnProgressLink = function(title){
+            $log.info(title + " on progress");
         }
     })
     .controller('DetailController', function (iRoadModal, $scope,$uibModalInstance,program,event) {
