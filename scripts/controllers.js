@@ -140,12 +140,22 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
         };
 
         $scope.addRelationData = function(relationName,event){
+            $scope.relationProgram = null;
             iRoadModal.getProgramByName(relationName).then(function(program){
                 program.displayName = $scope.program.displayName + " - " + relationName;
                 $scope.relationProgram = program;
-                console.log(program);
-                console.log(relationName);
-                console.log(event);
+                iRoadModal.getRelationshipDataElementByProgram(iRoadModal.refferencePrefix + $scope.programName,program).then(function(dataElement){
+                    var relationEvent = {};
+                    iRoadModal.initiateEvent(relationEvent,$scope.relationProgram).then(function(newEvent){
+                        newEvent.dataValues.forEach(function(dataValue){
+                            if(dataValue.dataElement == dataElement.id){
+                                dataValue.value = event.event;
+                            }
+                        });
+                        console.log(newEvent);
+                    });
+                });
+
             });
         };
 
