@@ -5,11 +5,11 @@
 /* Controllers */
 var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
 
-    .controller('MainController', function (NgTableParams,iRoadModal, $scope,$uibModal,$log) {
+    .controller('MainController', function (NgTableParams,iRoadModal, $scope,$uibModal,$log,toaster) {
         //$scope.offenceEvent = iRoadModal("Offence Event");
         $scope.loading = true;
         $scope.tableParams = new NgTableParams();
-        $scope.params ={pageSize:5};
+        $scope.params ={pageSize:20};
 
         $scope.programName = "Vehicle";
         function createColumns(programStageDataElements) {
@@ -177,6 +177,7 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
         $scope.viewRelationData = function(relationName,eventId){
             console.log(relationName);
             console.log(eventId);
+            toaster.pop('success','View for ' + relationName + ' on progress');
         };
 
     })
@@ -205,10 +206,10 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                     if(dataValue.dataElement == dataElement.id){
                         index = i;
                     }
-                })
+                });
                 return index;
             }
-        })
+        });
         $scope.program = program;
 
         $scope.save = function () {
@@ -226,4 +227,4 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
                 $uibModalInstance.dismiss('cancel');
             })
         };
-    })
+    });
