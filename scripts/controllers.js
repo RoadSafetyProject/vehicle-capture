@@ -140,22 +140,37 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
         };
 
         $scope.addRelationData = function(relationName,event){
-            $scope.relationProgram = null;
             iRoadModal.getProgramByName(relationName).then(function(program){
                 program.displayName = $scope.program.displayName + " - " + relationName;
-                $scope.relationProgram = program;
                 iRoadModal.getRelationshipDataElementByProgram(iRoadModal.refferencePrefix + $scope.programName,program).then(function(dataElement){
                     var relationEvent = {};
-                    iRoadModal.initiateEvent(relationEvent,$scope.relationProgram).then(function(newEvent){
+                    iRoadModal.initiateEvent(relationEvent,program).then(function(newEvent){
                         newEvent.dataValues.forEach(function(dataValue){
                             if(dataValue.dataElement == dataElement.id){
                                 dataValue.value = event.event;
                             }
                         });
-                        console.log(newEvent);
+                        var modalInstance = $uibModal.open({
+                            animation: $scope.animationsEnabled,
+                            templateUrl: 'views/addedit.html',
+                            controller: 'EditController',
+                            size: "lg",
+                            resolve: {
+                                event: function () {
+                                    return newEvent;
+                                },
+                                program:function(){
+                                    return program;
+                                }
+                            }
+                        });
+                        modalInstance.result.then(function (resultEvent) {
+                            console.log(resultEvent);
+                        }, function () {
+                            $log.info('Relation Modal dismissed at: ' + new Date());
+                        });
                     });
                 });
-
             });
         };
 
@@ -164,9 +179,6 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             console.log(eventId);
         };
 
-        $scope.showOnProgressLink = function(title){
-            $log.info(title + " on progress");
-        }
     })
     .controller('DetailController', function (iRoadModal, $scope,$uibModalInstance,program,event) {
         $scope.loading = true;
