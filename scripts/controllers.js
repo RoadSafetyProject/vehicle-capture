@@ -147,7 +147,9 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
             });
 
             modalInstance.result.then(function (resultEvent) {
-                $scope.tableParams.data.push(resultEvent);
+                if(resultEvent && resultEvent.event){
+                    $scope.tableParams.data.push(resultEvent);
+                }
             }, function () {
             });
         };
