@@ -236,6 +236,9 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
         $scope.tableParams = new NgTableParams();
 
         $scope.tableCols = createColumns(program.programStages[0].programStageDataElements);
+        if(events.length ==0){
+            $scope.loading = false;
+        }
         events.forEach(function(event){
             iRoadModal.getRelations(event).then(function(newEvent){
                 $scope.events.push(newEvent);
