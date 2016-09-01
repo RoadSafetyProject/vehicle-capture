@@ -40,7 +40,10 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
         /**
          * getAllVehicles
          */
-        getAllVehicles();
+        dhis2.loadData = function(){
+            getAllVehicles();
+        };
+
         function getAllVehicles(){
             iRoadModal.getAll($scope.programName,$scope.params).then(function(results){
                 $scope.tableParams.settings({
