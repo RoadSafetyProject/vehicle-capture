@@ -5,37 +5,11 @@
 /* Controllers */
 var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
 
-    .controller('MainController', function (NgTableParams,iRoadModal, $scope,$uibModal,$log,toaster) {
+    .controller('MainController', function (NgTableParams,iRoadModal, $scope,$uibModal,$log,toaster,$timeout) {
 
         $scope.loading = true;
-        $scope.tableParams = new NgTableParams();
-        $scope.params ={pageSize:20};
+        $scope.pager ={pageSize:10};
         $scope.programName = "Vehicle";
-
-        function createColumns(programStageDataElements) {
-            var cols = [];
-            if (programStageDataElements){
-                programStageDataElements.forEach(function (programStageDataElement) {
-                    var filter = {};
-                    filter[programStageDataElement.dataElement.name.replace(" ","")] = 'text';
-                    cols.push({
-                        field: programStageDataElement.dataElement.name.replace(" ",""),
-                        title: programStageDataElement.dataElement.name,
-                        headerTitle: programStageDataElement.dataElement.name,
-                        show: programStageDataElement.displayInReports,
-                        sortable: programStageDataElement.dataElement.name.replace(" ",""),
-                        filter: filter
-                    });
-                })
-            }
-            cols.push({
-                field: "",
-                title: "Action",
-                headerTitle: "Action",
-                show: true
-            });
-            return cols;
-        }
 
         /**
          * getAllVehicles
@@ -45,17 +19,26 @@ var appControllers = angular.module('appControllers', ['iroad-relation-modal'])
         };
 
         function getAllVehicles(){
-            iRoadModal.getAll($scope.programName,$scope.params).then(function(results){
-                $scope.tableParams.settings({
-                    dataset: results
-                });
-                $scope.loading = false;
-                iRoadModal.getProgramByName($scope.programName).then(function(program){
-                    $scope.program = program;
-                    $scope.tableCols = createColumns(program.programStages[0].programStageDataElements);
-
-                })
-            })
+            $scope.loading = true;
+            $scope.tableParams = new NgTableParams({count:$scope.pager.pageSize}, {
+                getData: function(params) {
+                    $scope.pager.page = params.page();
+                    // ajax request to api
+                    return iRoadModal.getProgramByName($scope.programName).then(function(program){
+                        $scope.program = program;
+                        $scope.tableCols = iRoadModal.createColumns(program.programStages[0].programStageDataElements);
+                        return iRoadModal.getAll($scope.programName,$scope.pager).then(function(results){
+                            $scope.pager = results.pager;
+                            params.page($scope.pager.page);
+                            params.total($scope.pager.total);
+                            $timeout(function(){
+                                $scope.loading = false;
+                            });
+                            return results.events;
+                        })
+                    })
+                }
+            });
         }
 
         /**
